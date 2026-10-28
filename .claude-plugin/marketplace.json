@@ -1,0 +1,24 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "artcraft-skills",
+  "description": "Community skills for the ArtCraft creative apps, driven through their MCP servers.",
+  "owner": {
+    "name": "Daniele Viti",
+    "url": "https://github.com/dnviti"
+  },
+  "plugins": [
+    {
+      "name": "artcraft-skills",
+      "source": "./",
+      "description": "14 skills for ArtCraft apps: FigCraft, WordCraft, DeckCraft, GridCraft, PdfCraft, PhotoCraft, VectorCraft, SolidCraft, CadCraft, DesignCraft, EffectCraft, FilmCraft, LightCraft and SoundCraft.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Daniele Viti"
+      },
+      "homepage": "https://github.com/dnviti/artcraft-skills",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": ["artcraft", "mcp", "design", "documents", "cad", "video", "audio", "photo"]
+    }
+  ]
+}

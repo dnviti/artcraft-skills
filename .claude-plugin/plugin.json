@@ -1,0 +1,13 @@
+{
+  "name": "artcraft-skills",
+  "version": "1.0.0",
+  "description": "Community skills for the ArtCraft creative apps (FigCraft, WordCraft, DeckCraft, GridCraft, PdfCraft, PhotoCraft, VectorCraft, SolidCraft, CadCraft, DesignCraft, EffectCraft, FilmCraft, LightCraft, SoundCraft), driven through their MCP servers.",
+  "author": {
+    "name": "Daniele Viti",
+    "url": "https://github.com/dnviti"
+  },
+  "homepage": "https://github.com/dnviti/artcraft-skills",
+  "repository": "https://github.com/dnviti/artcraft-skills",
+  "license": "MIT",
+  "keywords": ["artcraft", "mcp", "design", "documents", "spreadsheets", "pdf", "cad", "video", "audio", "photo"]
+}

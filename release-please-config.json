@@ -1,0 +1,118 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "simple",
+  "include-v-in-tag": true,
+  "include-component-in-tag": false,
+  "changelog-sections": [
+    {
+      "type": "feat",
+      "section": "Features"
+    },
+    {
+      "type": "fix",
+      "section": "Bug Fixes"
+    },
+    {
+      "type": "perf",
+      "section": "Performance"
+    },
+    {
+      "type": "docs",
+      "section": "Documentation"
+    },
+    {
+      "type": "refactor",
+      "section": "Refactoring",
+      "hidden": true
+    },
+    {
+      "type": "chore",
+      "section": "Miscellaneous",
+      "hidden": true
+    },
+    {
+      "type": "ci",
+      "section": "CI",
+      "hidden": true
+    },
+    {
+      "type": "test",
+      "section": "Tests",
+      "hidden": true
+    }
+  ],
+  "packages": {
+    ".": {
+      "package-name": "artcraft-skills",
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        {
+          "type": "generic",
+          "path": "skills/cadcraft-drawings/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/deckcraft-presentations/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/designcraft-layout/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/effectcraft-motion/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/figcraft-design/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/filmcraft-video/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/gridcraft-spreadsheets/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/lightcraft-photos/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/pdfcraft-documents/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/photocraft-images/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/solidcraft-cad/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/soundcraft-audio/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/vectorcraft-illustration/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/wordcraft-documents/SKILL.md"
+        },
+        {
+          "type": "json",
+          "path": ".claude-plugin/plugin.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
+          "path": ".claude-plugin/marketplace.json",
+          "jsonpath": "$.plugins[0].version"
+        }
+      ]
+    }
+  }
+}
