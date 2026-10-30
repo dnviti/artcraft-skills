@@ -1,6 +1,6 @@
 ---
 name: figcraft-design
-description: "Design UI in FigCraft (ArtCraft's Figma-class design app, driven through the `figcraft` MCP server) and turn FigCraft designs into frontend code. Use whenever the user mentions FigCraft or the figcraft MCP tools, or asks to design a screen, app screen, mobile screen, landing page, dashboard, UI mockup, wireframe, design system, design tokens, color/text styles, variables, Light/Dark themes, components with variants, a clickable prototype or user flow; or to implement, build, code up or hand off a FigCraft design (design to code, React, Tailwind, CSS variables, export assets/icons). Covers the brief → tokens → components → screens → screenshot-verify → prototype workflow, distinctive (non-generic) visual design, and pixel-faithful implementation in the user's stack."
+description: "Design UI in FigCraft (ArtCraft's Figma-class design app, driven through the `figcraft` MCP server) and turn FigCraft designs into frontend code. Use whenever the user mentions FigCraft or the figcraft MCP tools, or asks to design a screen, app screen, mobile screen, landing page, dashboard, UI mockup, wireframe, design system, design tokens, color/text styles, variables, Light/Dark themes, components with variants, a clickable prototype or user flow; asks for a distinctive, unique, non-generic or 'not AI-looking' UI, a new product-UI visual direction, several divergent design directions to choose from or an art-director critique; or to implement, build, code up or hand off a FigCraft design (design to code, React, Tailwind, CSS variables, export assets/icons). Covers brief → divergent directions → tokens → anchor component → screens → screenshot-verify → adversarial review → prototype, with distinctive (non-generic) design as the default, and pixel-faithful implementation in the user's stack."
 license: MIT
 metadata:
   author: dnviti
@@ -14,10 +14,20 @@ variants, styles, variables with modes, prototyping, Dev Mode code). You drive i
 `figcraft` MCP server. This skill tells you **what to build, in what order, to what quality bar**,
 and how to carry a design into code.
 
+**Uniqueness is the default.** Left alone, a model converges on the average of every UI it has seen
+(centred hero, three cards, a safe sans, a purple gradient), and adjectives like "bold" or "unique"
+in a prompt do not move it. Distinctive work comes from improbable inputs (a metaphor from outside
+software, real references that are not SaaS galleries), arbitrary constraints that block the default
+answer, the user choosing among genuinely divergent directions, and critique from someone who did not
+make the work. The steps below build those four in; the user's explicit direction, brand or existing
+design system always wins over them.
+
 - Detailed command ids and params: `references/command-catalog.md`
 - Step-by-step recipes (mobile screen, design system, landing page, prototype flow): `references/workflows.md`
 - Design → code in the user's stack: `references/design-to-code.md`
 - Traps and fixes: `references/gotchas.md`
+- Distinctiveness detail (DESIGN.md template, metaphors and constraints, fonts, OKLCH helper,
+  extended ban list, consistency audit, full review prompt): `references/distinctiveness.md`
 - Attribution: `references/sources.md`
 
 ## 0. Ground rules for the tools
@@ -52,18 +62,19 @@ with ToolSearch (`select:mcp__figcraft__batch,mcp__figcraft__run_command,...`) b
 
 Scale the work to the request (one screen ≠ a full library). For anything non-trivial follow:
 
-1. **Brief** → understand the product, audience, primary job, platform, content.
-2. **Design plan** → tokens (colour, type, spacing, radius, elevation) + layout concept; critique
-   it against the brief for genericness *before* building.
-3. **Foundations in FigCraft** → variable collections with modes, paint/text/effect styles.
-4. **Components** → base components, variants, properties, token bindings.
-5. **Screens** → device frames with nested auto layout, built from component instances and real copy.
-6. **Verify loop** → `get_node`/`inspect_document` for numbers, `screenshot` for pixels; fix; repeat.
-7. **Prototype** → interactions, flow starting point, device settings.
-8. **Show and approve** (mandatory, always last) → save the design to a `.figcraft` file, open it
+1. **Brief** → product, audience, primary job, platform, content; operational or showcase.
+2. **Design plan** → tone, metaphor, constraints, tokens + layout concept; critique it against the
+   brief for genericness *before* building.
+3. **Divergent directions** → 2–6 directions; the user picks or hybridises (section 2).
+4. **Foundations in FigCraft** → variable collections with modes, paint/text/effect styles.
+5. **Components** → the anchor component first, then the rest in its image; one signature interaction.
+6. **Screens** → device frames with nested auto layout, built from component instances and real copy.
+7. **Verify loop** → numbers and screenshots; fix; repeat; then a clean-context adversarial review.
+8. **Prototype** → interactions, flow starting point, device settings.
+9. **Show and approve** (mandatory, always last) → save the design to a `.figcraft` file, open it
    in the FigCraft app, then stop and wait for the user's explicit acceptance (section 9).
-9. **Handoff / code** (if asked, and only after acceptance) → mark ready for dev, export assets,
-   generate and adapt code.
+10. **Handoff / code** (if asked, and only after acceptance) → mark ready for dev, export assets,
+    generate and adapt code.
 
 State a short scope + acceptance checklist before mutating; give updates at phase boundaries, not
 per call. Stop when the checklist passes; don't silently grow a screen request into a design system.
@@ -87,23 +98,82 @@ per call. Stop when the checklist passes; don't silently grow a screen request i
 If the brief doesn't name the subject, audience and primary job, propose one concrete answer for
 each and confirm when the work is substantial. The subject's world (industry, materials,
 vocabulary, users' context) is where distinctive choices come from: a field-service app for
-plumbers and a meditation app should not share a look.
+plumbers and a meditation app should not share a look. The brief also fixes:
+
+- **Operational or showcase.** Operational UIs (admin, internal tools, consoles, dashboards used
+  all day) keep conventional control placement, states, feedback, keyboard paths and terminology;
+  their uniqueness lives in type, composition, material, motion and microcopy. Showcase UIs
+  (landing, campaign, portfolio) may bend layout conventions, never accessibility.
+- **The one memorable thing**, in a single sentence: what a viewer remembers after closing it.
+- **Tone in 3 non-generic words** that describe a world ("ledger-precise", "salt-worn",
+  "backstage"). Never modern, clean, minimal, professional, sleek, intuitive, elegant, simple.
 
 Write a compact plan (in chat, a few lines each):
 
-- **Colour**: 4–6 named hex values (background, surface, text, muted text, primary/accent, one
-  status colour if needed), plus the Dark mode counterpart when theming is in scope.
-- **Type**: one or two families with clear roles, a modular scale (e.g. 12/14/16/20/24/32/48),
-  weights, line heights (≈1.4–1.6 body, ≈1.1–1.25 display), letter spacing for large sizes.
-  Check availability with `text.fonts {family}` / `text.missingFonts`; don't assume Inter.
+- **Metaphor from outside software** (a ship's logbook, a railway timetable, a synthesiser panel, a
+  seed packet), translated into structure, type, interaction and copy, not just colour: a logbook
+  becomes dated entries, ruled columns, margin annotations and a "signed off" confirmation.
+- **References**: the user's, or real ones outside SaaS galleries (editorial sites, posters,
+  packaging, manuals, instrument panels). Note what you take from each (the grid, the size
+  contrast, the treatment of numbers), never "the style"; never copy logos, artwork or a layout.
+- **At least 2 arbitrary constraints** that block a default you would otherwise reach for: an odd
+  column count, two weights on a 1:3 size ratio, radius 0 everywhere, one colour per screen plus
+  black, a palette sampled from a non-digital photo. A constraint that changes nothing is replaced.
+- **Colour**: one dominant hue and one sharp accent, neutrals tinted toward the dominant (not five
+  timid tints): 4–6 named hex values (background, surface, text, muted text, accent, one status
+  colour if needed), plus a Dark counterpart re-picked per token, not inverted, when theming is in
+  scope. OKLCH makes even lightness steps easy; FigCraft takes hex (helper in the reference).
+- **Type**: a display and a text face that contrast in structure, chosen for this subject; a
+  modular scale (e.g. 12/14/16/20/24/32/48), weights, line heights (≈1.4–1.6 body, ≈1.1–1.25
+  display), tighter tracking at large sizes. Inter, Roboto, Arial, Helvetica, system-ui and Space
+  Grotesk only if the brand uses them or the plan says why (sources and exceptions in the
+  reference §4). Check
+  `text.fonts {family}` / `text.missingFonts`; installing a font changes the system: ask first.
 - **Spacing & shape**: 4- or 8-pt scale; radius scale tied to hierarchy (not one radius
-  everywhere); elevation used sparingly.
-- **Layout**: frame size (`frame.presets`), grid/columns, alignment, a quick ASCII wireframe.
-- **The one memorable thing**: where boldness is spent (the hero type, an illustration, a data
-  visual, a colour field). Everything else stays quiet.
+  everywhere); elevation used sparingly; density at an extreme (generous or truly dense), not the
+  comfortable middle.
+- **Layout**: frame size (`frame.presets`), grid/columns, alignment, a quick ASCII wireframe; where
+  the one memorable thing spends its boldness (hero type, an illustration, a data visual, a colour
+  field). Everything else stays quiet.
+
+When divergent directions follow, the plan fixes only the brief-level items (subject, the one
+memorable thing, tone); metaphor, constraints, type and palette are set per direction, and the
+chosen one goes into `DESIGN.md`.
 
 Then review the plan: if a part is what you'd produce for *any* similar brief, change it and say
-what you changed. The user's explicit direction always wins over these defaults.
+what you changed. The user's explicit direction always wins over these defaults. Work that spans
+sessions or goes to code persists brief and plan as `DESIGN.md` beside the `.figcraft` file or at
+the project root (template in the reference); otherwise the plan in chat is enough.
+
+### Divergent directions
+
+Generate, then let the user choose. Light requests (one screen, a restyle) get 2–3 quick
+directions; a new product, landing page with ambition, design system or redesign gets 4–6. Small
+edits skip this; otherwise skip it only when the user already gave a direction or an existing
+brand/system fixes the look.
+
+- Every direction differs from every other on **all four axes**: layout structure, type, palette,
+  interaction behaviour. Two that share two axes are one direction: drop one and redo it. Each
+  renders the **same anchor screen** with real copy (desktop and mobile for full identity work).
+- **One page per direction**: `page.add {name:"Direction A - Logbook"}` (the new page becomes
+  current, so new frames land on it). **One variable collection per direction**
+  (`variable.createCollection {name:"Dir A", modes:["Light"]}`) with the same slash names in each:
+  identical names coexist across collections and `variable.export {collections:["Dir A"],
+  format:"css"}` exports one alone (both verified). Bind layers even in sketches.
+- **Build FigCraft directions sequentially, never in parallel subagents**: all would drive one
+  headless session where `page.add`/`page.duplicate` switch the current page, `open_file` the
+  document, and concurrent calls are unverified. Code-side directions may run in parallel.
+- **Present**: verify each (section 7 steps 1–4), save and open the file (section 9), then give each
+  direction a short card (name, what makes it recognisable, the metaphor reading, the risk,
+  screenshots) and ask with the multiple-choice question tool (AskUserQuestion in Claude Code; else a
+  numbered list), multi-select so the user can hybridise ("grid of A + type of C"). **Never pick for
+  the user**; if asked for a recommendation, give its reason and still let them choose. This rule
+  covers creative directions, while technical options may carry a labelled recommendation. Inside a
+  subagent, return the options (cards, screenshot paths, brief) to the orchestrator, which asks the
+  user. Keep rejected direction pages in the file.
+- **Promote the winner**: `variable.renameCollection {collection:"Dir B", name:"Color"}` (verified),
+  move hybrid values in with `variable.set`. `variable.deleteCollection` leaves bound layers with
+  raw values: delete rejected collections only when those pages no longer need to stay editable.
 
 ## 3. Design quality bar
 
@@ -119,12 +189,21 @@ or a fixed text width). Serif body text gets a bit more line height.
 - the SaaS card kit: everything chopped into identical rounded cards with one radius and the same
   soft grey shadow, gradient washes as decoration;
 - stock palettes that read as "AI default": warm cream + serif + terracotta accent; near-black +
-  one acid-green accent; hairline-ruled newspaper grids;
+  one acid-green accent; hairline-ruled newspaper grids (archival, editorial and manual metaphors
+  pull straight here: let a constraint take another route);
 - big number + small label + gradient accent as the reflexive hero; 01/02/03 markers on content
-  that is not a sequence; monospace for small data labels by habit.
+  that is not a sequence; monospace for small data labels by habit;
+- the template page: centred hero with headline, subline and primary + ghost buttons; a three-up
+  icon + title + two-line feature grid repeated down the page; a greyed "trusted by" logo strip;
+  every section the same width, alignment and rhythm;
+- purple/violet/indigo gradients on white; glassmorphism, blobs, mesh gradients or noise as filler;
+  Dark mode as a mechanical inversion;
+- emoji as icons; a stock icon set at its default stroke and size; fade-and-slide-up on every
+  element and hover scale on every card. More in `references/distinctiveness.md`.
 
 **Structure is information.** Borders, dividers, numbering, labels and eyebrows must encode
-something real. Use proximity and spacing for grouping first.
+something real. Use proximity and spacing for grouping first. **Traceability**: every visible
+choice traces to the brief, the metaphor or a constraint; if it doesn't, remove it.
 
 **Hierarchy**: one primary action per view; size, weight and contrast define reading order; align
 to a grid; generous, consistent spacing from the scale (no 13 px or 27 px one-offs).
@@ -139,7 +218,10 @@ where it explains a change (Smart Animate between states, a single entrance mome
 **Copy is design**: real, specific content for the subject (no lorem ipsum). Name things the way
 users think of them; sentence case; active verbs on buttons ("Save changes", not "Submit"); the
 same action keeps its name across the flow ("Publish" → "Published"); errors say what happened and
-how to fix it; empty states invite the next action.
+how to fix it; empty states invite the next action. Write in the product's own voice and its
+metaphor's vocabulary (the logbook UI "logs" and "signs off"), never "Unlock the power of…",
+"Seamless", "Elevate your…"; loading, empty, error and success are designed moments in that voice,
+not "No data" or "Something went wrong".
 
 **Quality floor (state coverage)**: components show default/hover/pressed/disabled/focus (visible
 focus ring) and, where relevant, error/empty/loading; touch targets ≥ 44×44 on mobile.
@@ -173,11 +255,23 @@ batch {"label":"Foundations","commands":[
   `visible`. Check `boundVariables` in `get_node`.
 - Theme check: `variable.setMode {ids:[frame], collection:"Color", mode:"Dark"}`, screenshot, then
   set back (`mode: null` = Auto).
+- Colour planned in OKLCH: convert to hex for the variables (helper in
+  `references/distinctiveness.md`) and keep both in the plan or `DESIGN.md`; code can use OKLCH.
 
 ## 5. Components and variants
 
 Build components **on a Components page or an empty canvas area, never inside a screen's
 auto-layout flow** (a component set dropped into a flow resizes and clips it).
+
+**Anchor first.** Finish the one component that carries the identity (header, main card, data
+table, key form, hero) with variants and states before anything else; in full identity work get it
+approved through the section 9 loop. Everything else looks made by the same hand: it reuses the
+anchor's variables, text styles, radii, strokes and spacing rhythm; a new value goes into the
+variables (and `DESIGN.md`) first, never as a one-off on a layer.
+
+**One signature interaction**: a single behaviour repeated coherently (how panels arrive, how data
+reveals, a press feedback), not ten scattered hovers. Prototype it with Smart Animate (section 8);
+in code it needs a `prefers-reduced-motion` equivalent that keeps the meaning.
 
 1. Build the base as an auto-layout frame (hug height, sensible padding), with tokens bound.
 2. `component.create {ids:[frame]}` → main component.
@@ -217,6 +311,10 @@ Name layers semantically (`Button`, `Label`, `Icon`), because names drive genera
   `absolute: true` + constraints.
 - Images: `image.place {path|data, parent, width, height, mode:"fill"}` (needs a readable path).
   Don't use third-party logos or copyrighted images; use neutral placeholders the user can swap.
+- Original assets: at least one asset no template has, drawn from the metaphor: icons, patterns,
+  illustration via `vectorcraft-illustration` ("Icon on a 24 pt grid" recipe; keep the master),
+  animated ones (logo sting, empty state, loader) via `effectcraft-motion` (Lottie, WebM with
+  alpha). Place PNG exports in mockups with `image.place`. No emoji icons, no stock illustration.
 - Repeated content: build one card, then `data.fill {id, rows:[{Title:"…", Price:"…"}]}` or
   instances; apply repeated styling to many ids in one `batch`.
 - Build section by section (one `batch` per section), verifying after each.
@@ -227,12 +325,17 @@ After each major step:
 
 1. `get_node {id:<frame>, depth:3}`: check sizes, `sizing`, `layout`, fills, `boundVariables`,
    text props, `overrides`. Look for width 0/1 text, children wider than parents, unexpected
-   `fixed` sizing, unbound hex values that should be tokens.
+   `fixed` sizing, unbound hex values that should be tokens, spacing or radii off the scale, fonts
+   or sizes outside the plan. Check `text.missingFonts`: a fallback makes the screenshot lie.
 2. `screenshot {ids:[frame], maxSize:1200}` and **look at it** critically: alignment, rhythm,
    contrast, clipping, truncated text, empty boxes, the hierarchy you planned.
 3. Fix with `set_properties` / `batch`; use `undo` for a bad batch (one step).
 4. At the end: screenshot every deliverable frame, both theme modes if themed, and report the frame
    ids, what was built and any known limitations.
+5. **Adversarial art-director review** (anything beyond a small edit, before section 9): a fresh
+   agent with a clean context (not a fork) critiques the screenshots against the brief and the ban
+   list; prompt and triage in `references/distinctiveness.md` §8. Inside a subagent, return the
+   critique inputs (screenshot paths, brief, tells) to the orchestrator, which starts the reviewer.
 
 A picture beats a JSON diff for aesthetics; JSON beats a picture for exact values. Use both.
 
@@ -298,7 +401,9 @@ Follow `references/design-to-code.md`. Summary:
    the design provides them.
 6. **Reuse first**: search the codebase for existing Button/Input/Card/tokens before writing new
    ones; map FigCraft components to code with `codeConnect.set` / `codeConnect.import` so later
-   `inspect.code` emits the real component calls.
+   `inspect.code` emits the real component calls. Outside libraries (Radix, shadcn/ui, effect
+   collections) are raw material rewritten to the tokens, never the result; library, motion, font
+   and 1440/390 screenshot rules are in `references/design-to-code.md` §11.
 7. **Validate** the running UI against the reference screenshot: spacing, typography, colours,
    radii, states, responsive behaviour, assets; fix every in-scope mismatch, document intended
    deviations (accessibility, platform constraints).

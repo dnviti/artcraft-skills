@@ -15,6 +15,7 @@ is a precise **spec**, not the final code style.
 8. Components and Code Connect
 9. Validate
 10. Project rules file (optional)
+11. Distinctive build: libraries, assets, fonts, motion, screenshot loop
 
 ## 1. Inputs and target
 
@@ -171,3 +172,66 @@ write a short section into the project's `CLAUDE.md` / `AGENTS.md` (only if aske
   react as spec → reuse components → validate against screenshot";
 - token rules (never hardcode hex; spacing scale; radius scale), asset rules (export from
   FigCraft into `<dir>`; no new icon packages), Code Connect file location.
+
+## 11. Distinctive build: libraries, assets, fonts, motion, screenshot loop
+
+The design's distinctiveness (SKILL.md §2–3) has to survive implementation: the code carries the
+plan's tokens, fonts and the one signature interaction, not a library's defaults.
+
+**Component libraries are raw material, never the result.** The codebase's own components come
+first (§8). Outside libraries:
+
+| Kind | Examples | Use for | Never |
+|---|---|---|---|
+| Unstyled accessible primitives | Radix UI, React Aria, Ark UI, Headless UI | focus management, keyboard, ARIA, overlays, menus, comboboxes | keep their demo styling |
+| Skeleton kit | shadcn/ui | file structure and variant plumbing | ship its default tokens, radii, shadows or neutral palette |
+| Animated effects | Magic UI, Aceternity UI, React Bits, Motion Primitives | one effect that serves the signature interaction | paste a preset as is, stack several effects |
+
+For every piece taken from outside: cite the source (code comment or PR description); check its
+licence and dependencies before adding code (some collections mix permissive and restrictive terms
+or keep components behind a paid tier) and ask before adding a package the project does not have;
+rewrite it with the project's fonts, tokens, radius and stroke scales, spacing and motion timings. If
+it is still recognisable as "the one from library X", it is not finished.
+
+**SVG assets** (exported from FigCraft or made with `vectorcraft-illustration`): optimise with svgo
+(`npx svgo in.svg -o out.svg`, or the project's bundler plugin); keep `viewBox`, and keep ids that
+CSS or animation target (disable svgo's `cleanupIds` for those). Inline the SVG when it animates, is
+styled from CSS or should inherit `currentColor`; otherwise reference the file. Decorative SVG gets
+`aria-hidden="true"`, meaningful SVG a `<title>` or accessible label. Animated assets from
+`effectcraft-motion`: Lottie (play with a Lottie player, show a still frame under reduced motion) or
+WebM with alpha plus a poster image.
+
+**Fonts**: self-host WOFF2 with `@font-face` and `font-display: swap`, subset to the needed scripts,
+preload only the display face used above the fold; `font-variant-numeric: tabular-nums` where data
+aligns. Colour tokens planned in OKLCH go into code as `oklch()` under the exported variable names
+(`distinctiveness.md` §5).
+
+**Motion**: CSS first; GSAP or Motion (Framer Motion) when sequences, timelines or gestures need
+choreography; WebGL or canvas only when it carries the metaphor, lazy-loaded, paused off-screen, with
+a static fallback. One orchestrated entrance beats many hovers. Animate `transform` and `opacity`, not
+layout properties or large `box-shadow`/`filter` areas; nothing may block input. Modern CSS worth
+reaching for, with `@supports` where support is partial: odd grid tracks and subgrid, container
+queries, `clamp()` type, `text-wrap: balance`/`pretty`, `clip-path`, `@property`, variable-font axes,
+view transitions, scroll-driven animations. Reduced motion is mandatory and keeps meaning (replace
+movement with an instant change or a fade, never remove feedback):
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+```
+
+**Screenshot loop at 1440 and 390 px.** After each iteration, screenshot the running page at 1440 and
+390 px wide, compare with the FigCraft reference (§9) and the plan, fix, repeat: at least 2–3 rounds,
+stopping when a round finds nothing severe. Also capture hover and focus, an empty and an error state,
+reduced motion and Dark mode if in scope. Playwright (its MCP server, or the CLI:
+`npx playwright screenshot --viewport-size=1440,900 --full-page <url> <file>`; check
+`npx playwright screenshot --help` for the installed version) is optional third-party tooling, not an
+ArtCraft app: installing it or its browsers needs the user's agreement, and anything installed only
+for the task is removed afterwards. Write screenshots to a scratch folder, not the repository. The
+final screens then go to the adversarial review (SKILL.md §7).
