@@ -34,10 +34,12 @@ than ~3 dB of reduction the mix is too dynamic: compress the sources first inste
   params:{waveform:0, freq:440, level:-12}}`; shape with `edit.fades_create`; layer pitch with `audiosuite.process {process:"pitch_shift",
   params:{semitones:-5}}` on a duplicate.
 - Synth line: `track.new {kind:"instrument", name:"Lead", instrument:"subtractive_synth"}`, `midi.new_clip {track:"Lead", start:0, length:{seconds:8}}`,
-  `midi.note_add {clip:<id>, pitch:60|63|67..., start_ticks:0|480|960..., length_ticks:480, velocity:90}`, `mix.instrument_param {track:"Lead",
+  `midi.note_add {clip:<id>, pitch:60|63|67..., start_ticks:0|960|1920... (960 ticks = one quarter note), length_ticks:960, velocity:90}`, `mix.instrument_param {track:"Lead",
   param:"cutoff", value:...}`, `event.tempo {bpm:100}`, `event.quantize {grid:"1/16", strength:100}`. Drums: instrument `drum_synth`, notes on
   36 (kick), 38 (snare), 42 (closed hat) as defined by the synth: audition by bouncing 2 bars.
 - Sampler from a file: `track.new {kind:"instrument", instrument:"sampler"}`, `mix.sampler_load {track, path:"/abs/hit.wav", params:{root_note:60}}`.
+  Several zones of one instrument: one sampler track per sample with adjacent `key_low`/`key_high` (and `vel_low`/`vel_high` for layers)
+  and the same MIDI on every zone track (verified); libraries, routes and download rules in `sample-libraries.md`.
 
 ## 5. Convert / master a file with no session
 `soundcraft-cli convert /abs/in.mp3 /abs/out.wav --bit-depth 24 --rate 48000` (peak `--normalize` optional). Loudness of a file:

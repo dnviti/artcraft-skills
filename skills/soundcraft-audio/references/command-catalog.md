@@ -65,7 +65,7 @@ signal_generator, params, clips, tracks, start, end}`. Needs a selection of clip
 `event.tempo {bpm, at}`, `event.tempo_linear/parabolic/s_curve`, `event.meter {numerator, denominator}`, `event.add_key_change`,
 `event.beat_detective`, `event.identify_beat`, `markers.add {name, at | start,end}`, `markers.edit/delete/recall`,
 `transport.locate {at}`, `transport.status`; MIDI: `midi.new_clip {track, start, end|length}`, `midi.note_add {clip, pitch,
-start_ticks, length_ticks=480, velocity=100, channel}`, `midi.note_edit/note_delete/notes_move`, `midi.notes {clip}`,
+start_ticks, length_ticks=480 (an eighth note), velocity=100, channel}` (960 ticks per quarter note), `midi.note_edit/note_delete/notes_move`, `midi.notes {clip}`,
 `event.quantize {grid, strength, swing, clips}`, `event.transpose {semitones}`, `event.change_velocity {set|add|scale}`,
 `event.change_duration {legato}`, `event.step_input`, `event.midi_rtp`, `event.extract_chords`.
 Never call: `transport.record`, `mix.record_arm`, `track.set_record_to_input_only`, `setup.hardware` changes.
@@ -87,7 +87,8 @@ Never call: `transport.record`, `mix.record_arm`, `track.set_record_to_input_onl
   `dither` (`bits`, `noise_shaping`).
 - Instruments: `subtractive_synth` (`osc1_wave`, `osc2_wave`, `osc2_semitones`, `osc2_detune`, `osc_mix`, `cutoff`, `resonance`,
   `filter_env_amount`, `amp_attack|decay|sustain|release`, `filter_*`, `glide`, ...), `drum_synth` (`kick_tune|decay`, `snare_tune|snappy|decay`,
-  `hat_decay`, `open_hat_decay`, `tom_*`, `cymbal_decay`, `level`), `sampler` (`root_note`, `key_low|high`, `attack`..`release`, `loop_mode`, `level`).
+  `hat_decay`, `open_hat_decay`, `tom_*`, `cymbal_decay`, `level`), `sampler` (`root_note`, `transpose`, `fine_tune`, `key_track`, `key_low|high`, `vel_low|high`, `velocity`, `attack`..`release`,
+  `play_mode` 0 Gate/1 One Shot, `start`, `loop_mode` 0 Off/1 Forward/2 Ping-Pong, `loop_start|end`, `level`; one file per track).
 - `engine.clap_plugins {rescan}`, `engine.vst3_plugins {rescan}` list installed third-party plugins (`clap:...`, `vst3:...`).
 
 ## App-only (need `soundcraft --control PORT` + `soundcraft-cli mcp --connect PORT`)

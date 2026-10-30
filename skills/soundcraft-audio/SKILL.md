@@ -1,6 +1,6 @@
 ---
 name: soundcraft-audio
-description: "Edit, mix, master and sound-design audio and MIDI in SoundCraft (ArtCraft's Pro-Tools-class DAW, via the `soundcraft` MCP server (mcp__soundcraft__*) or `soundcraft-cli`). Use whenever the user mentions SoundCraft or the soundcraft MCP tools, or asks to edit, clean up, trim, fade, normalise, mix, master or bounce audio; podcast, voice-over, interview, audiobook or music mixes; hit a loudness target (LUFS, true peak); add EQ, compression, de-essing, gating, reverb or delay; build tracks, buses, sends and automation; edit or quantize MIDI and instrument tracks, synthesise sounds or drums; time-stretch/pitch-shift, strip silence, comp takes; convert between WAV/AIFF/FLAC/MP3/OGG, sample rates or bit depths; or work with .scraft sessions. Covers the session-first workflow, loudness verification, bounce and the mandatory show-and-approve phase. Video editing (and mixing audio inside a video timeline) belongs to filmcraft-video; animated motion graphics to effectcraft-motion. No live microphone recording."
+description: "Edit, mix, master and sound-design audio and MIDI in SoundCraft (ArtCraft's Pro-Tools-class DAW, via the `soundcraft` MCP server or `soundcraft-cli`). Use whenever the user mentions SoundCraft or the soundcraft MCP tools, or asks to edit, clean up, trim, fade, normalise, mix, master or bounce audio; podcast, voice-over, interview, audiobook or music mixes; hit a loudness target (LUFS, true peak); add EQ, compression, de-essing, gating, reverb or delay; build tracks, buses, sends and automation; compose a song, beat or jingle; edit or quantize MIDI, synthesise sounds or drums; sampled instruments, SoundFonts, SFZ; time-stretch/pitch-shift, strip silence, comp takes; convert formats or sample rates; or work with .scraft sessions. Covers the session-first workflow, loudness checks and the mandatory show-and-approve phase. Generating speech from text belongs to soundcraft-tts. Video editing (and its audio timeline) belongs to filmcraft-video; motion graphics to effectcraft-motion. No live microphone recording."
 license: MIT
 metadata:
   author: dnviti
@@ -19,6 +19,8 @@ and how to hand the result to the user.
 
 - Command ids and params by area, plugin parameter ids and ranges: `references/command-catalog.md`
 - Recipes (podcast clean-up, music mix, loudness target, sound design, MIDI): `references/recipes.md`
+- Sampled instruments: routes, library catalogue, download safety, manifest, credits: `references/sample-libraries.md`
+- Sources and licences: `references/sources.md`
 
 ## 0. Ground rules for the tools
 
@@ -97,16 +99,33 @@ the **peak to -0.1 dBFS** only (not loudness).
 1. **Brief**: what is the piece (podcast episode, voice-over, song mix, sound effect, ringtone,
    audiobook chapter), the delivery spec (format, sample rate, bit depth, loudness target, length),
    where the source files are, what must not change. Ask only what you cannot infer.
-2. **Safe start**: never edit the user's files. Import into a session (references in place), work in
+   **Music you create** (song, beat, loop, jingle, cue): left alone, generated music drifts to the
+   average (four-on-the-floor, I–V–vi–IV, 120 BPM in C, presets as loaded), so the brief also fixes,
+   in a few lines, a **reference or metaphor from outside the obvious genre template**, translated into
+   groove, palette and form (a lullaby built like a night freight train: slow heavy pulse, metallic
+   accents, long fade-in), and **1–2 arbitrary constraints** that block a default (7/8 or 5/4, three
+   instruments only, 87 BPM in F# Dorian, no hi-hats, the bass is a pitched sample of a door slam).
+   Replace a constraint that changes nothing. The user's genre, tempo, key or references always win.
+2. **Sounds** (music and sound creation): check the installed libraries, ask only if they fall short
+   (section 3, "Sampled instruments").
+3. **Safe start**: never edit the user's files. Import into a session (references in place), work in
    the session, bounce to a new file. Create the project folder first (section 1).
-3. **Plan the session** (tracks, order of processing, buses) before building (section 3).
-4. **Build in passes**, verifying after each (section 5): structure/edit -> clean -> balance -> tone
+4. **Plan the session** (tracks, order of processing, buses) before building (section 3). For created
+   music, first **2–3 divergent sketches** of 8 bars that differ in groove, harmony and palette (not one
+   idea at three tempos): one small session per sketch (tempo and meter are session-wide), each bounced
+   to a short WAV. Offer them with the multiple-choice question tool (AskUserQuestion in Claude Code;
+   else a numbered list) so the user picks or combines; never pick for the user. This rule covers
+   creative directions, while technical options (such as the library question in section 3) may carry
+   a labelled recommendation. Inside a subagent, return the options (WAV paths, session paths, brief)
+   to the orchestrator, which asks the user. Skip this when the user already fixed the direction.
+5. **Build in passes**, verifying after each (section 5): structure/edit -> clean -> balance -> tone
    and dynamics -> space/effects -> loudness.
-5. **Save** the session and **Show and approve** (section 7).
-6. **Final bounce/export** only after acceptance (section 6), unless the user asked up front for a
+6. **Save** the session and **Show and approve** (section 7).
+7. **Final bounce/export** only after acceptance (section 6), unless the user asked up front for a
    file to be produced straight away.
 
 Scale the work: "normalise this recording" is import, loudness measure, gain, bounce; not a full mix.
+A single sound effect needs no sketches.
 
 ## 3. Craft know-how
 
@@ -150,12 +169,38 @@ with `edit.tce_to_timeline` (pitch preserved) or `audiosuite.process {process:"t
 `event.beat_detective`/`event.identify_beat` for tempo from audio.
 
 **MIDI and synths**: `track.new {kind:"instrument", name, instrument:"subtractive_synth"|"drum_synth"|"sampler"}`
-(or `mix.instrument`); `midi.new_clip {track, start, length}`, `midi.note_add {clip, pitch, start_ticks,
-length_ticks, velocity}` (480 ticks per quarter note; 60 = middle C), `midi.notes_move`, `event.quantize
-{grid:"1/16", strength, swing}`, `event.transpose`, `event.change_velocity`; `file.import_midi`,
-`file.export_midi`; synth parameters via `mix.instrument_param {track, param, value}`. Sampler:
-`mix.sampler_load {track, path}`. Test tones/sweeps: `audiosuite.process {process:"signal_generator",
-params:{waveform,freq,level}}` over a time selection.
+(or `mix.instrument`); `midi.new_clip {track, start, length}`, `midi.note_add {clip, pitch,
+start_ticks, length_ticks, velocity, channel}` (**960 ticks per quarter note**, verified; 60 = middle
+C), `midi.notes {clip}`, `midi.notes_move`, `event.quantize {grid:"1/16", strength, swing}`,
+`event.transpose`, `event.change_velocity`; `file.import_midi`, `file.export_midi`; synth parameters
+via `mix.instrument_param {track, param, value}`. Sampler (one file per track): `mix.sampler_load
+{track, path, params:{root_note, key_low, key_high, vel_low, vel_high, play_mode}}`. Test
+tones/sweeps: `audiosuite.process {process:"signal_generator", params:{waveform,freq,level}}` over a
+time selection.
+
+**Sampled instruments** (creating a song, beat or sounds). The built-ins are synthesised
+(`subtractive_synth`, `drum_synth`) plus the one-file-per-track `sampler`; there is no SF2/SFZ player
+and no LV2. CLAP/VST3 instruments load with `mix.instrument {track, plugin:"clap:…"|"vst3:…"}`
+(`engine.clap_plugins`/`engine.vst3_plugins {rescan:true}`). Before building:
+
+1. **Check**: the manifest `~/.local/share/sounds/artcraft-libraries.json`, `~/.local/share/sounds/sf2/`
+   and `sfz/`, `/usr/share/soundfonts/`, `command -v fluidsynth`. If what the brief needs is there, use
+   it without asking; never re-download.
+2. **Ask** otherwise, once per project, with the multiple-choice question tool (AskUserQuestion in
+   Claude Code; else a numbered list; inside a subagent, return the question to the orchestrator,
+   which asks the user): **Starter pack, ~200 MB, commercial use allowed with credits (see licences)
+   (Recommended)** / **Full pack, ~8–10 GB** / **Pick specific instruments** / **Built-in instruments
+   only**. Name sizes and licences in the options. The starter pack is SF2/SF3: without fluidsynth the
+   user installs it with the system package manager (e.g. `sudo dnf install fluidsynth` on Fedora) in
+   their own terminal, never you (its own yes), or offer the WAV/FLAC libraries instead.
+3. **Download** only accepted packs, one at a time, following the safety checklist in
+   `references/sample-libraries.md`: size and licences stated, 2× free space, own empty folder, archive
+   tested, nothing run from it, SHA-256, licence files kept, manifest updated.
+4. **Load** by route: (1) WAV/FLAC in the sampler, one track per key/velocity zone (verified, a crude
+   multisample); (2) SF2/SF3 rendered per part with fluidsynth, then imported as audio (not verified
+   here); (3) SFZ through the sfizz plugin (unverified, optional), else its WAV/FLAC files via route 1.
+   Route-1 files must be inside the read root; a symlink pointing outside it is rejected (verified).
+5. **Credits**: `CREDITS.txt` beside the session for every CC-BY/CC-BY-SA item used; tell the user.
 
 **Loudness and formats** (measure with the bounce result, `lufs` = integrated LUFS):
 - Podcast/spoken word: **-16 LUFS stereo** (-19 mono) integrated, true peak <= -1 dBTP (Apple/Spotify
@@ -208,7 +253,15 @@ SoundCraft cannot be listened to headless, so verify with numbers and structure:
    say clearly that you could not hear it.
 4. **Edit checks**: after cuts, `edit.strip_silence_preview`, marker names, and a bounce of each cut point
    range; look for gaps, doubled words, missing fades.
-5. **Fix and repeat**: `edit.undo`, change the parameter, re-bounce. Clean up your test bounces.
+5. **Created music: clean-context critique** before show-and-approve. A reviewer that did not make the
+   piece (a fresh subagent, not a fork) gets only the brief and the session data (`inspect_session`,
+   `midi.notes` per clip, tempo, meter, insert and instrument params) and lists default-AI-music tells:
+   four-on-the-floor in every section, I–V–vi–IV by habit, 120 BPM in C major/A minor for no reason,
+   instruments and plugins left at default settings, every note on the 1/16 grid (starts all multiples
+   of 240 ticks) at one velocity, reverb on everything. Fix each one or say why it stays; choices the
+   brief made explicitly are not tells. Inside a subagent, return the critique inputs (session path,
+   session data, brief, tells) to the orchestrator, which starts the reviewer.
+6. **Fix and repeat**: `edit.undo`, change the parameter, re-bounce. Clean up your test bounces.
 
 ## 6. Save and export
 
