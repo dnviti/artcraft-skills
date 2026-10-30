@@ -48,6 +48,10 @@
       "extra-files": [
         {
           "type": "generic",
+          "path": "skills/artcraft-router/SKILL.md"
+        },
+        {
+          "type": "generic",
           "path": "skills/cadcraft-drawings/SKILL.md"
         },
         {
@@ -93,6 +97,10 @@
         {
           "type": "generic",
           "path": "skills/soundcraft-audio/SKILL.md"
+        },
+        {
+          "type": "generic",
+          "path": "skills/soundcraft-tts/SKILL.md"
         },
         {
           "type": "generic",

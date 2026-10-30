@@ -33,6 +33,8 @@ The skills.sh badge above starts rendering after the first installs are recorded
 | FilmCraft | [`filmcraft-video`](skills/filmcraft-video) | Cut, grade and mix video; export video and EDL/XML/AAF/OTIO |
 | LightCraft | [`lightcraft-photos`](skills/lightcraft-photos) | Cull and organise photo libraries; develop raw files non-destructively |
 | SoundCraft | [`soundcraft-audio`](skills/soundcraft-audio) | Edit, mix and master audio and MIDI to a loudness target |
+| SoundCraft | [`soundcraft-tts`](skills/soundcraft-tts) | Text to speech (local Kokoro/Piper or ElevenLabs, Google, Polly), mastered in SoundCraft; needs `soundcraft-audio` |
+| All apps | [`artcraft-router`](skills/artcraft-router) | Pick which skill(s) to load for multi-app or ambiguous requests, and load only those |
 
 Each skill's `description` also states which sibling skill owns neighbouring jobs (for example UI mockups belong
 to `figcraft-design`, not `vectorcraft-illustration`), so the agent routes work to the right app.
@@ -82,7 +84,7 @@ npx skills add dnviti/artcraft-skills --list
 # install one skill, globally, for Claude Code
 npx skills add dnviti/artcraft-skills --skill figcraft-design -a claude-code -g
 
-# install all 14 skills, globally, non-interactively
+# install all 16 skills, globally, non-interactively
 npx skills add dnviti/artcraft-skills --skill '*' -a claude-code -g -y
 ```
 
@@ -90,7 +92,7 @@ Run `npx skills add dnviti/artcraft-skills` without flags for the interactive pi
 
 ### As a Claude Code plugin
 
-This repo is also a Claude Code plugin marketplace with a single plugin that bundles all 14 skills:
+This repo is also a Claude Code plugin marketplace with a single plugin that bundles all 16 skills:
 
 ```text
 /plugin marketplace add dnviti/artcraft-skills

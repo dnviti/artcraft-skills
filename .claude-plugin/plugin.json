@@ -1,7 +1,7 @@
 {
   "name": "artcraft-skills",
   "version": "1.0.0",
-  "description": "Community skills for the ArtCraft creative apps (FigCraft, WordCraft, DeckCraft, GridCraft, PdfCraft, PhotoCraft, VectorCraft, SolidCraft, CadCraft, DesignCraft, EffectCraft, FilmCraft, LightCraft, SoundCraft), driven through their MCP servers.",
+  "description": "Community skills for the ArtCraft creative apps (FigCraft, WordCraft, DeckCraft, GridCraft, PdfCraft, PhotoCraft, VectorCraft, SolidCraft, CadCraft, DesignCraft, EffectCraft, FilmCraft, LightCraft, SoundCraft, plus text to speech finished in SoundCraft, and a router that picks the right skill), driven through their MCP servers.",
   "author": {
     "name": "Daniele Viti",
     "url": "https://github.com/dnviti"
