@@ -4,7 +4,7 @@ description: "Organise photo libraries and develop raw/JPEG photos non-destructi
 license: MIT
 metadata:
   author: dnviti
-  version: "1.0.0" # x-release-please-version
+  version: "1.1.0" # x-release-please-version
 ---
 
 # LightCraft photos

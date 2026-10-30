@@ -4,7 +4,7 @@ description: "Create and edit Word-style documents in WordCraft (ArtCraft's word
 license: MIT
 metadata:
   author: dnviti
-  version: "1.0.0" # x-release-please-version
+  version: "1.1.0" # x-release-please-version
 ---
 
 # WordCraft documents

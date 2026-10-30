@@ -4,7 +4,7 @@ description: "Edit, mix, master and sound-design audio and MIDI in SoundCraft (A
 license: MIT
 metadata:
   author: dnviti
-  version: "1.0.0" # x-release-please-version
+  version: "1.1.0" # x-release-please-version
 ---
 
 # SoundCraft audio

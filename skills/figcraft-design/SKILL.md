@@ -4,7 +4,7 @@ description: "Design UI in FigCraft (ArtCraft's Figma-class design app, driven t
 license: MIT
 metadata:
   author: dnviti
-  version: "1.0.0" # x-release-please-version
+  version: "1.1.0" # x-release-please-version
 ---
 
 # FigCraft design
