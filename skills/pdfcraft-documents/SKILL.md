@@ -4,7 +4,7 @@ description: "Edit, secure, fill, sign, redact, OCR, compare and check PDFs in P
 license: MIT
 metadata:
   author: dnviti
-  version: "1.0.0" # x-release-please-version
+  version: "1.1.0" # x-release-please-version
 ---
 
 # PdfCraft documents

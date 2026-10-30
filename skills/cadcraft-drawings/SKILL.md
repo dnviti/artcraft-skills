@@ -4,7 +4,7 @@ description: "Draft, dimension, annotate and plot 2D technical drawings in CadCr
 license: MIT
 metadata:
   author: dnviti
-  version: "1.0.0" # x-release-please-version
+  version: "1.1.0" # x-release-please-version
 ---
 
 # CadCraft drawings

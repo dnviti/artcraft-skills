@@ -4,7 +4,7 @@ description: "Design parametric 3D parts in SolidCraft (ArtCraft's parametric CA
 license: MIT
 metadata:
   author: dnviti
-  version: "1.0.0" # x-release-please-version
+  version: "1.1.0" # x-release-please-version
 ---
 
 # SolidCraft CAD

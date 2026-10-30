@@ -4,7 +4,7 @@ description: "Turn text into finished spoken audio: text to speech (TTS, voice s
 license: MIT
 metadata:
   author: dnviti
-  version: "1.0.0" # x-release-please-version
+  version: "1.1.0" # x-release-please-version
 ---
 
 # SoundCraft text to speech

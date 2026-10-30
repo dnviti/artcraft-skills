@@ -11,14 +11,23 @@
       "name": "artcraft-skills",
       "source": "./",
       "description": "16 skills for ArtCraft apps: FigCraft, WordCraft, DeckCraft, GridCraft, PdfCraft, PhotoCraft, VectorCraft, SolidCraft, CadCraft, DesignCraft, EffectCraft, FilmCraft, LightCraft and SoundCraft (audio editing plus text to speech), plus a router that picks the right skill(s).",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "Daniele Viti"
       },
       "homepage": "https://github.com/dnviti/artcraft-skills",
       "license": "MIT",
       "category": "productivity",
-      "keywords": ["artcraft", "mcp", "design", "documents", "cad", "video", "audio", "photo"]
+      "keywords": [
+        "artcraft",
+        "mcp",
+        "design",
+        "documents",
+        "cad",
+        "video",
+        "audio",
+        "photo"
+      ]
     }
   ]
 }

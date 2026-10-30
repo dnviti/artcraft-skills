@@ -4,7 +4,7 @@ description: "Build and edit spreadsheets in GridCraft (ArtCraft's Excel-class s
 license: MIT
 metadata:
   author: dnviti
-  version: "1.0.0" # x-release-please-version
+  version: "1.1.0" # x-release-please-version
 ---
 
 # GridCraft spreadsheets

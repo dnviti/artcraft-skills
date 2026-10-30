@@ -4,7 +4,7 @@ description: "Edit video, colour-grade and mix sound in FilmCraft (ArtCraft's Pr
 license: MIT
 metadata:
   author: dnviti
-  version: "1.0.0" # x-release-please-version
+  version: "1.1.0" # x-release-please-version
 ---
 
 # FilmCraft video editing
