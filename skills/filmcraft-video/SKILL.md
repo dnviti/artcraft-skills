@@ -16,6 +16,13 @@ multicam, proxies, export queue. Project file: `.fcproj`. Codecs are the app's o
 You drive it with the `filmcraft` MCP server (headless engine) or `filmcraft-cli` from Bash. This skill says
 what to do, in what order, to what quality bar, and how to hand the result over.
 
+**An edit has a voice; the default voice is the stock montage.** Unsteered, you will cut every piece
+the same way: drone or slow-mo opener, cross dissolves on the beat, the "Cinematic" preset grade,
+word-pop captions. Corrective jobs (trims, cleanup, conforming, deliverables) stay invisible; where
+the cut has character to give, it comes from a rhythm borrowed from outside video templates, an
+editing rule that forbids the easy move, alternative cuts the user picks between, and a viewer who
+did not edit it. The user's references, brand film or broadcast spec win.
+
 - Command ids and params by area: `references/command-catalog.md`
 - Recipes (rough cut, interview cleanup, grade, speed ramp, social vertical, proxies, interchange): `references/recipes.md`
 - Siblings: `effectcraft-motion` (animated titles, keying, VFX, composites; render ProRes/PNG to bring here),
@@ -77,10 +84,24 @@ filmcraft-cli import /abs/a.mov /abs/b.mov ; filmcraft-cli probe /abs/a.mov   # 
    `file.newSequenceFromClip {items}` to match the first clip). Use the footage's frame rate (do not default to
    23.976 if shooting was 25/30). Name bins (`file.newBin`) and rename clips.
 4. **Plan the edit** (a few lines): shot order, durations, music bed, titles, transitions, grade, loudness target.
-5. **Assemble** with `timeline.place` (back-to-back `items`, `insert`), trim with `timeline.trim`/`razor`, tidy
+   For anything with a creative brief (promo, reel, short, story), add a **rhythm borrowed from
+   outside video** (a comic strip's panel beats; a radio play where sound leads picture; a match
+   report's scoreline structure) and **1-2 edit rules** (no dissolves, hard cuts only; every cut lands
+   on a sound; no music for the first 20 s; one shot size per section). Every transition, speed change
+   and grade move should trace to the brief, the rhythm or a rule.
+5. **Alternative cuts** (creative briefs only; skip for corrective work or a locked structure): cut the
+   opening 15-30 s (or the key scene) 2-3 ways in separate sequences of one project (`file.newSequence`
+   per version, named after its idea), differing in structure (cold open vs chronological), rhythm,
+   music use and grade, not just in transition choice. Build the options sequentially in the one
+   headless session, never in parallel subagents. Save and open the project (section 8), name the
+   sequences, then ask with the multiple-choice question tool (AskUserQuestion in Claude Code; else a
+   numbered list), multi-select for hybrids. Never pick for the user. This rule covers creative
+   directions, while technical options may carry a labelled recommendation. Inside a subagent, return
+   the options (project path, sequence names, brief) to the orchestrator, which asks the user.
+6. **Assemble** with `timeline.place` (back-to-back `items`, `insert`), trim with `timeline.trim`/`razor`, tidy
    gaps (`sequence.closeGap`), add transitions, titles, captions; then grade; then audio mix.
-6. **Verify loop** after each block (section 5). 7. **Save** the `.fcproj`, then **Show and approve** (section 8).
-8. **Final export** only after acceptance (section 7), unless asked up front.
+7. **Verify loop** after each block (section 5). 8. **Save** the `.fcproj`, then **Show and approve** (section 8).
+9. **Final export** only after acceptance (section 7), unless asked up front.
 
 Scale to the request: "cut these three clips together with a fade" is one sequence, three placements and one
 transition, not a full mix and grade.
@@ -109,7 +130,8 @@ transition, not a full mix and grade.
 - **Colour** (do in this order, one clip, then match the rest): 1) technical: correct exposure/white balance
   (Lumetri basic: `temperature`, `tint`, `exposure`, `contrast`, `highlights`, `shadows`, `whites`, `blacks`, `saturation`) while reading
   `scopes.read {scopes:["waveform","parade","vectorscopeYuv"]}` (keep skin on the skin line, blacks near 0, whites below clipping);
-  2) match shots (`lumetri.applyMatch {clip, referenceFrame}` or copy attributes `edit.pasteAttributes`); 3) creative look: `lumetri.applyPreset
+  2) match shots (`lumetri.applyMatch {clip, referenceFrame}` or copy attributes `edit.pasteAttributes`); 3) creative look built
+  from the plan's rhythm and reference, with a preset only as a starting point you then reshape: `lumetri.applyPreset
   {name, clips}` (Cinematic, Film Emulation, Monochrome, Technical) or LUTs (`lut.import`, `lumetri.setInputLut` for camera log to
   Rec.709, `lumetri.setLook` for a creative LUT); 4) secondary/masks (`masks.add`, HSL section, vignette). Use an
   **adjustment layer** (`file.newAdjustmentLayer`, placed above) for a grade over many clips. Respect the sequence working space
@@ -130,6 +152,11 @@ transition, not a full mix and grade.
 - **Offline/missing media**: `media.findMissing`, `media.relink`, `media.autoRelink {from,to}`; exports with offline media render placeholders
   and are flagged `offlineMedia`; fix before delivering.
 - **Interchange**: `file.exportInterchange {format: xml|fcpxml|otio|edl|aaf|omf, path}`, `file.importAaf`; `.prproj` cannot be opened (import FCP7 XML/AAF/OTIO).
+- **Default tells** (template-edit giveaways; use only when the brief asks): cross dissolves or whip/whoosh
+  transitions on every cut; slow motion as the default emotion; Ken Burns pans on every still; the
+  "Cinematic" Lumetri preset left as is, crushed blacks and letterbox bars added in post; a drone
+  or timelapse opener; cuts on every downbeat of a stock track for the whole piece; word-by-word pop
+  captions with emoji; a light-leak or glitch transition pack; "Thanks for watching" end cards.
 - Do not fabricate evidence: no deceptive edits of real people's statements or fake news footage.
 
 ## 4. Building blocks
@@ -162,6 +189,13 @@ After each block:
    export, `ffmpeg -i out.mp4 -af ebur128 -f null -` for loudness and `ffprobe` for streams.
 5. Fix with a command, `edit.undo`, or by adjusting the clip's own params; repeat.
 6. Before saving: no empty tracks you don't want, no leftover test clips, sequence settings right, media online (`media.findMissing`).
+7. **Outside viewer** (creative edits beyond a small change, before section 8): a fresh subagent with a clean context, not a
+   fork, gets only the frame stills around each cut, a cut list (clip, in/out, duration, transition) from `sequence_inspect`,
+   the plan with its rhythm and rules, and the tells in section 3. As an editor who did not cut it, it lists what feels like
+   a template or AI-assembled montage, where the rhythm or rules break, and any technical fault (flash frames, jump cuts,
+   unreadable titles), most damaging first, a one-line fix each, no compliments. Fix what hurts the piece; say which notes you
+   decline and why. Inside a subagent, return the critique inputs (still paths, cut list, plan, tells) to the orchestrator,
+   which starts the reviewer.
 
 ## 6. Save
 

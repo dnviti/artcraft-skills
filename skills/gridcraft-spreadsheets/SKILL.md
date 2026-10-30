@@ -123,6 +123,9 @@ negative red `"#,##0;[Red]-#,##0"`. Align numbers right, headers matching their 
 `chart.changeColors`, `chart.addElement {element:"trendline"}`. Source range = header row +
 category column + series columns only (no totals row). Always title the chart and label axes.
 `insert.chartRecommendations {range}` suggests suitable types.
+Never leave a chart as inserted (default multi-colour palette, a legend for one series, a title
+that just repeats the column name): recolour with `chart.changeColors` to the sheet's one accent on
+the series that answers the question and neutrals for the rest, and let the title state the finding.
 
 **Pivots**: `insert.pivotTable {source:"Sales" | "Sheet1!$A$1:$E$200", rows:[...], columns:[...],
 values:[{field,func}], filters:[...], destination}`; adjust with `pivot.addField/valueSettings/

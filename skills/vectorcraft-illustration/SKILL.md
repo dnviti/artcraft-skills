@@ -1,6 +1,6 @@
 ---
 name: vectorcraft-illustration
-description: "Draw and edit vector graphics in VectorCraft (ArtCraft's Illustrator-class vector illustration app, driven through the `vectorcraft` MCP server, tools mcp__vectorcraft__*). Use whenever the user mentions VectorCraft or the vectorcraft MCP tools, or asks to draw/design a logo, logomark, wordmark, icon or icon set, badge, emblem, illustration, pattern, infographic, chart/graph artwork, poster or print layout, business card, sticker, or to clean up, trace (image trace), recolour or convert SVG/PDF/AI/EPS artwork; or to export SVG, PDF, PNG, ICO-sized assets from vector art. Covers shapes, Bezier paths, pathfinder, gradients, strokes, live effects, text and outlines, artboards, colour modes (RGB/CMYK), the render-and-verify loop, save/export and the mandatory show-and-approve phase. UI/screen/app design (mockups, wireframes, design systems) belongs to figcraft-design, photo editing to photocraft-images."
+description: "Draw and edit vector graphics in VectorCraft (ArtCraft's Illustrator-class vector illustration app, driven through the `vectorcraft` MCP server, tools mcp__vectorcraft__*). Use whenever the user mentions VectorCraft or the vectorcraft MCP tools, or asks to draw/design a logo, logomark, wordmark, icon or icon set, badge, emblem, illustration, pattern, infographic, chart/graph artwork, poster or print layout, business card, sticker (including distinctive, non-generic marks chosen from rough concepts), or to clean up, trace (image trace), recolour or convert SVG/PDF/AI/EPS artwork; or to export SVG, PDF, PNG, ICO-sized assets from vector art. Covers shapes, Bezier paths, pathfinder, gradients, strokes, live effects, text and outlines, artboards, colour modes (RGB/CMYK), the render-and-verify loop, save/export and the mandatory show-and-approve phase. UI/screen/app design (mockups, wireframes, design systems) belongs to figcraft-design, photo editing to photocraft-images."
 license: MIT
 metadata:
   author: dnviti
@@ -14,6 +14,12 @@ Shape Builder, gradients and meshes, strokes and brushes, live effects and appea
 swatches, blends, repeats, type (point, area, on path), Image Trace, artboards, CMYK/RGB, graphs.
 Native `.vectorcraft`; reads/writes SVG, PDF, AI, EPS, DXF, PNG, JPG, WebP, PSD and more. You drive
 it through the `vectorcraft` MCP server (headless engine) and, for batch jobs, `vectorcraft-cli`.
+
+**A mark that could belong to anyone has failed.** Unprompted, you will draw the statistical logo: a
+swoosh, a globe, initials in a circle, a gradient blob. Asking yourself for "unique" does not change
+that; changing the inputs does: a form taken from the client's own trade or place, a construction rule
+the drawing must obey, rough alternatives the user chooses between, and a critic who did not draw it.
+The user's brand or explicit direction overrides all of this.
 
 - Command ids and params by area: `references/command-catalog.md`
 - Recipes (logo, icon set, badge, pattern, trace, print card): `references/recipes.md`
@@ -53,14 +59,29 @@ They are deferred: load schemas with ToolSearch (`+vectorcraft`, max_results 40)
 
 1. **Brief**: what is it (logo, icon, illustration, print piece), where used (web, app, print,
    embroidery, signage), sizes, colours/brand, required formats. Propose a concrete concept if absent.
+   Name a **source form outside graphic design** from the subject's world (a cooper's hoop, a tram
+   ticket punch, a hallmark stamp, the profile of a local bridge) and say what the drawing takes from
+   it (a silhouette, a cut, a rhythm), never the object as a literal pictogram.
 2. **Set up the document first**: right artboard size and units (`file.new`), colour mode (RGB for
    screen, CMYK for print: `file.documentColorMode {mode:"cmyk"}`), name layers.
-3. **Plan**: palette (3-5 colours, named swatches), grid/proportions, stroke weights, corner radii. Write
-   it in a few lines before drawing; critique for genericness (section 3).
-4. **Build** with live shapes and precise numbers, name every object, group logically, layers by role.
-5. **Verify loop** after each major step (section 4).
-6. **Save** `.vectorcraft` and **Show and approve** (section 6).
-7. **Final export** (SVG/PDF/PNG sets) only after acceptance.
+3. **Plan**: palette (3-5 colours, named swatches), grid/proportions, stroke weights, corner radii, and
+   **1-2 construction rules** that forbid your first idea (only 45/90° angles; one circle and its cuts;
+   a single stroke weight for everything; two flat colours, no gradient). Write it in a few lines
+   before drawing; critique for genericness (section 3) and swap any part you would draw for any client.
+4. **Divergent sketches** (logos, marks, icon or illustration styles; skip when the brand or user fixes
+   the form): 3-4 black-only roughs on separate artboards (2 for a small job) that differ in
+   construction and silhouette, not in colour or font. Build the options sequentially in the one
+   headless session, never in parallel subagents. Save and open them (section 6), then ask with the
+   multiple-choice question tool (AskUserQuestion in Claude Code; else a numbered list), multi-select so
+   roughs can be combined. Never pick for the user. This rule covers creative directions, while
+   technical options may carry a labelled recommendation. Inside a subagent, return the options (file
+   path, artboard names, PNG paths, brief) to the orchestrator, which asks the user.
+5. **Build** the chosen route with live shapes and precise numbers, name every object, group
+   logically, layers by role. Every shape, colour and weight should trace back to the brief, the
+   source form or a rule.
+6. **Verify loop** after each major step (section 4).
+7. **Save** `.vectorcraft` and **Show and approve** (section 6).
+8. **Final export** (SVG/PDF/PNG sets) only after acceptance.
 
 Existing file: `open_file {path}` (also SVG/PDF/AI/EPS/PNG, which becomes an image), `doc_inspect`,
 `swatch.list`, reuse what exists; never redraw what is in the document. Never overwrite the user's
@@ -140,6 +161,17 @@ original: `file.saveAs` to a new name first.
   `Background`); keep construction guides on a locked, non-printing layer, delete them before export.
 - **Originality**: do not copy a real brand's logo or trademarked artwork; do not imitate an existing
   company mark closely. Use neutral placeholders when the user has not supplied brand assets.
+- **Default tells** (clip-art and AI giveaways; use one only when the brief asks for it):
+  - a swoosh, orbit ring or underline arc around the name; a leaf for "green", an upward arrow or bar
+    chart for "growth", a lightbulb for "ideas";
+  - globes, gears, puzzle pieces, handshakes, house-with-roof outlines as the whole idea;
+  - gradient blobs, mesh-gradient orbs, blue-to-purple or sunset gradients on a flat mark;
+  - initials in a circle, shield or hexagon; a wide-tracked all-caps geometric sans (the installed
+    Montserrat or Comfortaa) as the wordmark by reflex;
+  - drop shadows, bevels, `threeD.extrude` or glossy highlights on a logo that should read flat;
+  - "corporate flat people" with oversized limbs, isometric everything, low-poly facets;
+  - icons all at the default 2 pt stroke, round caps and one corner radius, indistinguishable from a
+    free icon pack.
 
 ## 4. Verify loop (mandatory)
 
@@ -155,6 +187,12 @@ After each major step:
 4. Pre-export checks: text outlined if required, effects expanded where needed (`object.expand`), no
    hidden/stray objects (`select.object.strayPoints`, `document.find`), correct artboard dims, colour mode.
 5. Round trip export: export SVG, re-open or render the PNG, compare to the artboard preview.
+6. **Outside critique** (logos, icon sets, illustrations; not small edits), before section 6: a fresh
+   subagent with a clean context, not a fork, gets only the rendered PNGs (full size and 32 px), the
+   brief and the tells list in section 3, and is asked: what reads as clip-art, stock or AI-made, what
+   contradicts the brief, and could this mark be moved onto a competitor unchanged? No compliments,
+   no redesign. Fix what it rates severe, and tell the user where you disagree. Inside a subagent,
+   return the critique inputs (PNG paths, brief, tells) to the orchestrator, which starts the reviewer.
 
 ## 5. Save and export
 

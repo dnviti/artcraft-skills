@@ -16,6 +16,13 @@ Graphics templates, a render queue, Lottie import/export. Project file: `.ecproj
 You drive it with the `effectcraft` MCP server (headless engine, no window) or with `effectcraft-cli`
 from Bash. This skill says what to build, in what order, to what quality bar, and how to hand it over.
 
+**Motion has an accent; the default one is the preset pack.** Left alone you will ease everything in
+and out, slide it up with a fade, add a glow and spin the logo. Distinctive motion borrows its
+physics from somewhere real (how a rubber stamp lands, how a split-flap board flips, how a theatre
+curtain drags), obeys a rule that bans the reflex move, is chosen by the user from short tests that
+move differently, and is judged by someone who did not keyframe it. Brand motion guidelines and the
+user's direction win.
+
 - Command ids and params by area: `references/command-catalog.md`
 - Recipes (title card, lower third, kinetic type, logo sting, keying, tracking, Lottie, alpha render): `references/recipes.md`
 - Siblings: `filmcraft-video` (cut/assemble/grade/mix/export a video; it can place EffectCraft renders),
@@ -85,10 +92,24 @@ MCP tools: `command_list`, `command_run`, `command_batch`, `batch`, `list_comman
    where they are; save the project in the project directory (descriptive name). Existing project: `open_project`,
    `get_project`, `get_comp`, reuse comps/footage.
 3. **Plan** (a few lines): comp spec, layer stack (bottom to top), the motion (what moves, when, how long,
-   easing), palette/type, the one memorable moment. Timing sheet in seconds before keyframing.
-4. **Build** foundation first (comp, background, assets), then layers, then animation, then effects, then polish.
-5. **Verify loop** after each block (section 5). 6. **Save** the `.ecproj`, then **Show and approve** (section 8).
-7. **Final render** only after acceptance (section 7), unless the user asked for the render up front.
+   easing), palette/type, the one memorable moment. Timing sheet in seconds before keyframing. Add a
+   **physical motion source** from the subject's world and what it dictates (a press: hard hit, no
+   overshoot, 2-frame squash; a tide: slow, layered, never fully still), plus **1-2 rules** that block
+   the reflex (one axis of motion only; no opacity fades, only cuts and masks; hold keys on twos at
+   12 fps; one custom ease curve for the whole piece). Each move should trace to the brief, the source
+   or a rule.
+4. **Motion tests** (skip for small edits or when brand motion is fixed): 2-3 directions (one quick
+   comparison for a single lower third), each a style frame plus a 1-2 s test of the key move, in
+   separate comps of one project, differing in motion character, type and palette. Build the options
+   sequentially in the one headless session, never in parallel subagents. Save and open the project
+   (section 8), point to each comp, then ask with the multiple-choice question tool (AskUserQuestion in
+   Claude Code; else a numbered list), multi-select for hybrids. Never pick for the user. This rule
+   covers creative directions, while technical options may carry a labelled recommendation. Inside a
+   subagent, return the options (project path, comp names, brief) to the orchestrator, which asks the
+   user.
+5. **Build** foundation first (comp, background, assets), then layers, then animation, then effects, then polish.
+6. **Verify loop** after each block (section 5). 7. **Save** the `.ecproj`, then **Show and approve** (section 8).
+8. **Final render** only after acceptance (section 7), unless the user asked for the render up front.
 
 Scale to the request: a title card is one comp, 3 layers and 6 keyframes, not a 40-layer project.
 
@@ -99,8 +120,9 @@ Scale to the request: a title card is one comp, 3 layers and 6 keyframes, not a 
 - **Layers, not baked pixels**: solids/shapes/text stay editable. Name every layer (`name` param or
   `project.rename`), parent with `layer.setParent` (nulls for rigs), group repeated motion in precomps
   (`layer.precompose`) and reuse; use `layer.newAdjustment` for global grade/glow/vignette on top.
-- **Motion principles**: ease in and out (`easyEase`), 12-24 frame moves for UI-scale motion, overshoot sparingly
-  with bezier/`keys.setEase` influence, stagger (offset 2-4 frames per item; `layer.sequence`, text animators
+- **Motion principles**: no unshaped linear moves; start from `easyEase`, then give the curve the plan's
+  character with `keys.setEase` influence rather than leaving the same ease on every key. 12-24 frame
+  moves for UI-scale motion, overshoot sparingly, stagger (offset 2-4 frames per item; `layer.sequence`, text animators
   with range selectors), anticipation + settle, a clear read time (titles hold >= 1.5 s per line). Animate
   anchor/scale from the right anchor point. Motion blur on (`comp.setSwitch motionBlur` + per-layer `layer.setSwitch`).
 - **Text**: `layer.newText {text,font,style,size,fill,position|box,justify,tracking}`; check fonts with
@@ -136,6 +158,14 @@ Scale to the request: a title card is one comp, 3 layers and 6 keyframes, not a 
 - **Reusable assets**: `essential.*` builds Essential Graphics controls and `.ectemplate` templates
   (`essential.exportTemplate`); `templates.create` instantiates; `effectcraft-cli render --template T.ectemplate --values V.json`
   renders one instance (batch many titles with different text). `anim.savePreset` stores `.ecpreset`.
+- **Default tells** (preset-pack giveaways; use only when the brief asks):
+  - the same `easyEase` on every key, and every element fading in while sliding up a few pixels;
+  - lens flares, light leaks, generic outer glow or bokeh/particle loops as background filler;
+  - the logo that spins, flips in 3D or punches out of a particle burst, with a whoosh;
+  - typewriter reveals and per-word scale-pops by reflex in kinetic type;
+  - a lower third as a gradient bar sliding in from the left with a drop shadow;
+  - RGB-split glitches, camera shake or `wiggle()` on everything as "energy";
+  - all items staggered by the same offset in the same direction.
 - **Do not fabricate evidence**: no fake news/official graphics, no deceptive impersonation of real brands or people.
 
 ## 4. Building blocks
@@ -170,6 +200,14 @@ After each block, not only at the end:
    --start 0 --end 2 --resolution quarter --out /scratch/p.mp4`, then extract frames with
    `ffmpeg -v error -i p.mp4 -vf fps=4 /scratch/p_%02d.png` and Read a few; `ffprobe` confirms size/fps/frames.
 6. Before saving: no stray test layers, layer names sensible, comp duration/work area right, footage online (`footage.missing`).
+7. **Fresh-eyes review** (anything beyond a small edit, before section 8): a fresh subagent with a clean
+   context, not a fork, gets only a frame strip (frames every 0.1-0.25 s across the key moves, from step
+   2 or 5), the plan with its motion source and rules, and the tells in section 3. Its prompt: a motion
+   director who did not make this lists what looks like a preset or template, where the motion source
+   is lost, and any legibility or timing failure, ordered by severity with a one-line direction for
+   each fix; no praise, no re-animation. Address the severe ones; report what you skip and why.
+   Inside a subagent, return the critique inputs (frame strip paths, plan, tells) to the orchestrator,
+   which starts the reviewer.
 
 ## 6. Save
 

@@ -132,8 +132,13 @@ spaceAfter, lineSpacing, align}}`), so every paragraph stays consistent; use `de
   after; colour from one accent; never fake a heading with bold Normal text (it kills the TOC and
   navigation). Keep with next (`para.keepNext`) on headings, `para.keepLines` on short blocks.
 - **Fonts**: the default theme uses Aptos, which may be missing here and fall back silently; check
-  `font.list {all:true}` and prefer installed families (Carlito/Liberation/Inter/etc. depending on
-  the machine). Use at most two families. `font.add {path}` loads a TTF/OTF.
+  `font.list {all:true}` and prefer an installed family chosen for the reader (e.g. a less default
+  humanist sans or text serif the machine has, such as Source Sans 3 or Source Serif 4); Carlito and
+  Liberation are metric fallbacks, not a choice. Use at most two families. `font.add {path}` loads a TTF/OTF.
+- **Conventional, not anonymous**: keep the document kind's conventions, but never ship the template
+  look by default (fallback body font, stock blue headings, a shaded box on every heading). Pick a
+  heading/body pairing and one accent for this reader and subject, set them once with
+  `design.themeFonts`/`design.themeColors`, and let spacing and hierarchy carry the character.
 - **Page**: margins 54-72 pt (`layout.margins`), A4 or Letter (`layout.size`), orientation
   `layout.orientation`; columns `layout.columns {count}`; page breaks `text.pageBreak`; sections
   `layout.break {kind:"nextPage"}` for different orientation or numbering.

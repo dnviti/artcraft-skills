@@ -117,6 +117,9 @@ State the acceptance checklist before mutating; report at phase boundaries.
   `form_detect_fields {add:true}` to create fields from blanks, or `fill_sign_add` to place text/check marks.
   Verify by `form_fields` and a render. Keep the form editable unless asked to flatten (`doc_flatten`).
   XFA forms: `xfa_to_static` first (irreversible for scripts; ask).
+- **Added marks belong to the document**: headers/footers, stamps, watermarks and added text take the
+  standard face closest to the existing type (`text_fonts`), its colours and its margins, not a stock
+  grey diagonal "CONFIDENTIAL" in Helvetica, unless the user asks for exactly that.
 - **Merging/splitting**: `doc_combine {paths, pages?, out}` (ordered; keeps bookmarks, renames clashing
   form fields); `doc_split {doc, every|before|bookmarks|max_mb, out_dir}`; `page_extract`.
 - **Text edits**: `text_paragraphs {page}` gives paragraph numbers and boxes; `text_edit {paragraph|line,

@@ -15,6 +15,12 @@ Native format `.deckcraft` (a zip); it also opens/saves `.pptx` and exports png/
 You drive it through the `deckcraft` MCP server. This skill says what to build, in what order, to what
 quality bar, and how to verify it.
 
+**A deck should be recognisable without its logo.** By default you will produce the
+conference-template deck: blue theme, centred title, three bullets, an icon on each. Better
+adjectives in the plan do not fix that; what does is a visual idea taken from the talk's own world,
+a hard constraint on the slides, the user picking between look-and-feel options you mocked up, and a
+critique from someone who sees only the slides. The user's template or brand always comes first.
+
 ## 0. Tools and ground rules
 
 MCP tools (deferred: load schemas with ToolSearch `+deckcraft`, max_results 30):
@@ -55,12 +61,25 @@ headless with no window).
    decision/next steps. Cut anything that is not on that path. Confirm the outline when the deck is
    large or the brief is vague.
 3. **Design plan** (section 3): theme, 2 fonts, 4-6 colours, grid, the one memorable visual idea.
-4. **Build**: `new_presentation {theme}` or `file.new {theme, template, size}`
-   (`file.templates` lists starters; `blank:true` for no first slide), then slide by slide.
-5. **Verify loop** after each slide or small batch (section 5).
-6. **Speaker notes, transitions** if asked or the deck is for presenting (`slide.notes`, `transition.set`).
-7. **Show and approve** (mandatory, always last; section 8).
-8. Export (.pptx/.pdf/images) only after acceptance unless the user asked for it up front.
+   Root it in a **visual idea from outside slide-making** that fits the subject (a quarterly review
+   as a ship's log; a safety training as enamel warning signs; a product launch as a stage running
+   order) and **1-2 slide constraints** (no bullets anywhere; every slide one number or one sentence;
+   left third always empty; two colours plus black). If no choice traces back to the brief, the idea
+   or a constraint, redo it.
+4. **Create the deck**: `new_presentation {theme}` or `file.new {theme, template, size}`
+   (`file.templates` lists starters; `blank:true` for no first slide).
+   **Look options** (skip when the user's template or brand fixes the look): in that deck, build the
+   title slide and one evidence slide 2-3 ways (the third for a keynote or pitch), differing in
+   layout, type pairing and palette. Save and open it (section 8), then ask with the multiple-choice
+   question tool (AskUserQuestion in Claude Code; else a numbered list), multi-select for
+   combinations. Never pick for the user (this rule covers creative directions, while technical
+   options may carry a labelled recommendation). Inside a subagent, return the options (deck path,
+   slide numbers, brief) to the orchestrator, which asks the user. Delete the losing slides.
+5. **Build**: continue in the same deck with the chosen look, slide by slide.
+6. **Verify loop** after each slide or small batch (section 5).
+7. **Speaker notes, transitions** if asked or the deck is for presenting (`slide.notes`, `transition.set`).
+8. **Show and approve** (mandatory, always last; section 8).
+9. Export (.pptx/.pdf/images) only after acceptance unless the user asked for it up front.
 
 Scale to the request: a 3-slide update does not need sections and a custom master.
 
@@ -136,9 +155,15 @@ Distinctive, legible, restrained. Generic template-looking decks are the main fa
   `design.background`.
 - **Hierarchy**: size/weight/colour define reading order; the claim-title on top, the evidence big
   and unmistakable, source/footnote small at the bottom.
-- **Avoid default tells** unless asked: bullet walls, every slide the same title+bullets layout,
-  clip-art style icons everywhere, gradient decoration, an accent word in every title, 01/02/03 on
-  non-sequences, ALL-CAPS tracked eyebrow labels on every slide, identical rounded cards in 3-up grids.
+- **Avoid default tells** unless asked:
+  - centred title + three bullets as the default slide, and every slide in that same layout;
+  - corporate stock blue (or a blue-to-purple gradient) on white, or a built-in theme left untouched;
+  - an icon beside every bullet (`insert.icon` by reflex), clip-art pictograms, emoji;
+  - identical rounded cards in 3-up grids; SmartArt process chevrons for things that are not steps;
+  - an accent-coloured word in every title, ALL-CAPS tracked eyebrows, 01/02/03 on non-sequences;
+  - a stock photo under a dark overlay with white centred text as the "impact" slide;
+  - "Agenda" and "Thank you / Questions?" slides that carry no message;
+  - fly-in or bounce animations on every bullet.
   Vary slide types: big statement, chart, two-column compare, image + caption, section divider,
   quote/number callout.
 - **Data visuals**: label axes and units, remove chart junk (`chart.options {gridlines:false,
@@ -170,6 +195,14 @@ After each slide or small group:
 3. Fix with commands; `edit.undo` for a bad step.
 4. At the end: `inspect_document` (slide order, titles read as a story: read only the titles in
    sequence), render every slide, check notes and transitions, spelling of names/numbers.
+5. **Back-row critique** (decks beyond a few slides, before section 8): a fresh subagent with a clean
+   context, not a fork, gets only the rendered slide PNGs, the outline and design plan, and the tells
+   in section 3. It plays a sceptical audience member who has seen a thousand decks: which slides
+   could be dropped into any other company's deck, where the visual idea disappears, what is
+   unreadable from the back row, ranked by how much each hurts the talk, with a one-line fix
+   direction and no compliments. Fix the serious items; tell the user which ones you rejected and why.
+   Inside a subagent, return the critique inputs (PNG paths, outline and plan, tells) to the
+   orchestrator, which starts the reviewer.
 
 A picture beats a JSON diff for aesthetics; JSON beats a picture for exact numbers. Use both.
 

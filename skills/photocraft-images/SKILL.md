@@ -15,6 +15,13 @@ PNG, JPG, TIFF, WebP, EXR...). You drive it with the `photocraft` MCP server (he
 paths outside its file roots or when the preflight fails, with `photocraft-cli` from Bash (section 1). This skill says what to build,
 in what order, to what quality bar, and how to hand the result to the user.
 
+**A look is a decision, not a preset.** Asked to "make it pop", you will reach for the image-feed
+average: teal-orange, plastic skin, haloed skylines, a cutout on a gradient. Corrective work (cleanup,
+cutouts, sizing) stays faithful to the photo; anything with a look (a grade, a composite, a poster, a
+collage) gets its character from a reference outside photo apps, a constraint on the palette or
+process, looks the user picks between, and a viewer who did not edit it. The user's reference or
+brand look always wins.
+
 - Command ids and params by area: `references/command-catalog.md`
 - Recipes (retouch, background removal, collage, social/web export, text on photo): `references/recipes.md`
 
@@ -85,13 +92,26 @@ folders. Preview files go in a temp dir, not next to the user's files.
 ## 2. Workflow
 
 1. **Brief**: what is the image for (web, print, social, thumbnail), target size/format, what must not
-   change, where the original lives. Ask only what you cannot infer.
+   change, where the original lives. Ask only what you cannot infer. For a look, composite or poster,
+   also fix a **reference from outside photo editing** (a print process: risograph, cyanotype,
+   newspaper halftone; a slide film's fade; a painter's light) and say what it lends (palette,
+   contrast curve, grain, edge), plus **1-2 constraints** (two inks only; no global saturation boost;
+   grain from one film stock; a fixed crop ratio). Purely corrective jobs skip this.
 2. **Safe start**: never touch the original. Open or convert it into a project `.pcraft` copy (project
    dir or user-named path) and work there. New artwork: `doc_new` with the real target size.
 3. **Plan the layer stack** before editing (section 3), then build it.
-4. **Verify loop** after each major step (section 5).
-5. **Save** the layered `.pcraft` (keeps everything editable) and **Show and approve** (section 7).
-6. **Final export** only after acceptance (section 6).
+4. **Look variants** (looks, composites, posters; skip for corrective work or a given reference): 2-3
+   treatments that differ in palette, contrast and texture, each as its own named layer group of
+   adjustment layers over the same base, so only visibility changes between them (`layer.setProps
+   {visible}`). Render each, save and open the project (section 7), then ask with the multiple-choice
+   question tool (AskUserQuestion in Claude Code; else a numbered list), multi-select for blends. Never
+   pick for the user. This rule covers creative directions, while technical options may carry a labelled
+   recommendation. Inside a subagent, return the options (project path, group names, preview paths,
+   brief) to the orchestrator, which asks the user. Keep the chosen group, delete the rest before final
+   export.
+5. **Verify loop** after each major step (section 5).
+6. **Save** the layered `.pcraft` (keeps everything editable) and **Show and approve** (section 7).
+7. **Final export** only after acceptance (section 6).
 
 Scale work to the request: a one-line "brighten this" is one adjustment layer and a preview, not a
 10-layer retouch.
@@ -121,7 +141,13 @@ Scale work to the request: a one-line "brighten this" is one adjustment layer an
   (`image.mode.*`).
 - **Colour discipline**: keep one tonal intent (a look), neutralise casts before stylising, check skin
   tones are not clipped (use Levels/Curves points, not only Auto Tone). `image.autoTone/autoColor`
-  are starting points, judge the preview.
+  are starting points, judge the preview. Every adjustment layer should trace back to the brief,
+  the reference or a constraint; delete the ones that are there "to make it nicer".
+- **Default tells** (avoid unless the brief asks): teal shadows with orange skin; HDR-style halos
+  along skylines and edges from heavy local contrast; plastic, poreless skin from blur-based
+  retouching; replaced skies that are bluer and brighter than the light on the subject; Orton-style
+  glow; sharpening halos; cutouts with a soft drop shadow on a gradient backdrop; collages on a
+  perfectly even grid; a centred white headline with a drop shadow over the busiest part of the photo.
 - **Text and shapes**: `type.create {x,y,text,font,size,color,box?}` (check `type.fonts`) and
   `shape.create {kind,rect,fill,stroke}` stay editable vector/type layers until rasterized. Name layers
   (`layer.renameLayer`) and group (`layer.groupLayers`) so the stack reads.
@@ -163,7 +189,16 @@ After each major step:
    preview from a throw-away copy, or in MCP `command_run history.undo` after looking.
 4. Fix with a command, `history.undo`/`edit.undo`, or by adjusting the layer's own params; repeat.
 5. Before saving: layer names sensible, no empty/hidden junk (`layer.delete.hiddenLayers`,
-   `file.scripts.deleteAllEmptyLayers`), pixel size is what the brief asked.
+   `file.scripts.deleteAllEmptyLayers`; not while unchosen look variants still need to stay), pixel
+   size is what the brief asked.
+6. **Unbiased eye** (looks, composites, posters; not small corrections), before section 7: a fresh
+   subagent with a clean context, not a fork, gets only the before and after previews (plus a 100%
+   crop of faces or edges), the brief with its reference and constraints, and the tells in section 3.
+   As a photo editor who did not touch the file, it lists what looks like a filter preset or an
+   AI-generated image, any visible artefact (halos, banding, cutout edges, mismatched light), and
+   where the reference is lost, severest first, each with a one-line fix direction and no praise.
+   Fix the serious items, and report what you reject and why. Inside a subagent, return the critique
+   inputs (preview paths, brief, tells) to the orchestrator, which starts the reviewer.
 
 ## 6. Save and export
 

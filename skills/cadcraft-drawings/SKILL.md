@@ -116,7 +116,10 @@ two dimensions and a render, not a full title-blocked sheet.
 - **Layouts and plotting**: model space holds the full-size drawing; a layout is the sheet.
   `layout.new {name}` returns the viewport handle; `pagesetup {layout, paper:"A3", landscape:true}`;
   `layout.set {name}` to switch; `viewport.set {handle, scale:"1:50", center:[x,y]}` to frame the
-  model; add a title block (table/lines/text on a TITLE layer in the layout). `plot {path, layout,
+  model; add a title block (table/lines/text on a TITLE layer in the layout) filled with this
+  drawing's facts (title, scale, units, sheet, revision, date, author), with no generic template
+  leftovers ("COMPANY NAME", empty logo boxes, unused fields). On a drawing, clarity is the style:
+  no decorative frames, fills or extra fonts. `plot {path, layout,
   paper, landscape, fit?, scale?}` / `exportpdf` writes a vector PDF (lineweights on by default). Plot
   the model directly with `layout:"Model", scale:"1:50", paper`, or `fit:true`.
 - **Quantities**: `dist {p1,p2}`, `area {points|handle}`, `measuregeom`, `list {handles}`,

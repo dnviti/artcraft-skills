@@ -1,6 +1,6 @@
 ---
 name: designcraft-layout
-description: "Lay out magazines, books, brochures, flyers, catalogues, reports and other multi-page print documents in DesignCraft (ArtCraft's InDesign-class layout app, via the `designcraft` MCP server, mcp__designcraft__*, or `designcraft-cli`). Use whenever the user mentions DesignCraft or the designcraft MCP tools, or asks for page layout or desktop publishing work: a magazine or book layout, spreads with facing pages, parent (master) pages, running heads and page numbers, columns and grids, paragraph/character styles, text flow across threaded frames, image placement, tables, table of contents, footnotes, bleed and crop marks, preflight, print-ready PDF/X, IDML/InDesign import/export, EPUB. Covers setup, parents, styles, content flow, render-and-verify and the mandatory show-and-approve phase. Single-flow documents (letters, reports, contracts) belong to wordcraft-documents, vector artwork and logos to vectorcraft-illustration, editing an existing PDF to pdfcraft-documents, UI design to figcraft-design."
+description: "Lay out magazines, books, brochures, flyers, catalogues, designed annual reports and other multi-page print documents in DesignCraft (ArtCraft's InDesign-class layout app, via the `designcraft` MCP server or `designcraft-cli`). Use whenever the user mentions DesignCraft or the designcraft MCP tools, or asks for page layout or desktop publishing work: a magazine or book layout, spreads with facing pages, parent (master) pages, running heads and page numbers, columns and grids, paragraph/character styles, text flow across threaded frames, image placement, tables, table of contents, footnotes, bleed and crop marks, preflight, print-ready PDF/X, IDML/InDesign import/export, EPUB. Covers setup, parents, styles, content flow, render-and-verify and the mandatory show-and-approve phase. Single-flow documents (letters, reports, contracts) belong to wordcraft-documents, vector artwork and logos to vectorcraft-illustration, editing an existing PDF to pdfcraft-documents, UI design to figcraft-design."
 license: MIT
 metadata:
   author: dnviti
@@ -15,6 +15,13 @@ spot), tables, footnotes, TOC and index, links, bleed and slug, preflight, PDF/X
 and InDesign (.indd) import. Native format `.designcraft`. You drive it with the `designcraft`
 MCP server (headless engine) or with `designcraft-cli` from Bash. This skill says what to build,
 in what order, to what quality bar, and how to hand the result to the user.
+
+**Pages should look edited, not generated.** The path of least resistance is the template brochure:
+one family at 12 pt, everything centred, equal images in a lattice, every page cut from the same
+mould. A layout gets a face from a borrowed format (a field guide, an auction catalogue, a railway
+timetable, a seed catalogue), a grid rule that makes some pages uncomfortable on purpose, the user
+choosing between spreads that genuinely differ, and a reader who did not lay it out. The user's
+house style or brand guide always wins.
 
 - Command ids and params by area, recipes: `references/command-catalog.md`
 - Traps and fixes: `references/gotchas.md`
@@ -75,6 +82,11 @@ open/save/export/place work **under those folders only**. Outside them a call fa
 1. **Brief**: publication type, trim size, page count, spreads or single pages (facing pages for
    magazines/books), print or screen (PDF/X, CMYK vs RGB), who reads it, content available (text,
    images, brand colours, fonts), deliverable. Ask only what you cannot infer; state assumptions.
+   Add a **borrowed format** from outside the genre and what it lends (a field guide's numbered
+   specimens and margin notes; a timetable's rows and tabular figures), plus **2 constraints** that
+   rule out the template answer (a 7- or 9-column grid with one deliberate break per spread; text
+   always heavier than images; one accent colour per section; captions only in the outer margin).
+   Scale down for a one-page flyer: one format, one constraint.
 2. **Document setup**: `new_document {preset|width,height, pages, facingPages, columns, gutter,
    margins:{top,bottom,inside,outside}, bleed, intent}`. Print jobs: bleed 3 mm (9 pt) or 0.125 in (9 pt).
 3. **Grid and parents**: margins, columns, baseline grid, then parent pages (running heads, folios,
@@ -84,6 +96,16 @@ open/save/export/place work **under those folders only**. Outside them a call fa
 5. **Content**: stories threaded through frames, images placed and fitted, tables, captions.
 6. **Verify loop** (section 5) after every page or spread.
 7. **Preflight, save, export**, then **Show and approve** (section 7), always last.
+
+**Divergent spreads** (after the brief, before steps 3-4 fix the grid, parents and styles; skipped
+when a house style fixes the look): build the same opening spread (or cover + first spread) 2-4
+ways, each differing in grid, type pairing, image scale and pacing, not just colour; 2 for a flyer.
+Put each on its own pages of one draft document, save and open it as in section 7, then ask with the
+multiple-choice question tool (AskUserQuestion in Claude Code; else a numbered list), multi-select for
+hybrids. Never pick for the user; if they ask for advice, give the reason and let them choose. This
+rule covers creative directions, while technical options may carry a labelled recommendation. Inside
+a subagent, return the options (document path, page numbers, brief) to the orchestrator, which asks
+the user. Build the full document only in the chosen direction.
 
 Scale the work: a one-page flyer is a document, five styles, a handful of frames and a render;
 a 24-page magazine is parents, a style set, autoflowed stories and spread-by-spread checks.
@@ -97,7 +119,11 @@ a 24-page magazine is parents, a style set, autoflowed stories and spread-by-spr
   slight negative on large sizes; line length 45-75 characters (a 2-column grid on A4/Letter at
   9.5-10 pt body is about right).
 - Check fonts exist: `font.list`; missing fonts fall back silently. Safe installed families seen here:
-  Liberation Serif/Sans/Mono; ask the user for brand fonts and check them.
+  Liberation Serif/Sans/Mono; ask the user for brand fonts and check them. Liberation is a fallback,
+  not a choice: when the brief is open, propose faces that suit the borrowed format and ask before
+  installing any. Libre sources: Fontshare (ITF's own free licence), Velvetyne and Collletttivo
+  (mostly SIL OFL), and Google Fonts beyond the most popular families (OFL/Apache). Terms change:
+  verify each family's licence at download.
 - Paragraph styles carry alignment, indents, spacing and hyphenation (`style.paragraph.create {name,
   basedOn, nextStyle, para:{align,firstLineIndent,spaceAfter,...}, chars:{fontFamily,fontStyle,size,leading,tracking,fill}}`).
   `style.paragraph.apply {name}` then reads from the style; `clearOverrides` removes local tweaks.
@@ -132,6 +158,14 @@ Check `overset` in the result and in `inspect_document`/`preflight.run`. Paste s
 offset}`. Captions: `object.caption {text,position}` or a caption frame in the Caption style. Don't use copyrighted images;
 use user-provided files or neutral placeholders. Colour: print = CMYK swatches (`swatch.create
 {name, color:{c,m,y,k}}`), screen = RGB; `color.convert` to check; avoid 4-colour black on text (use K only).
+
+**Default tells** (avoid unless the brief or house style asks for them): centred headings, body and
+captions on every page; one family at the default 12 pt doing every job; images all the same size in
+a lattice; equal margins all round with no binding allowance and no white space used as structure;
+every spread built from the same parent with no change of pace (no quiet page, no full-bleed
+moment); drop shadows or rounded corners on photographs; pull quotes in giant decorative quotation
+marks; headline set over the middle of a busy photo; boxes and rules around every element; tinted
+gradient panels behind text. Every rule, tint and size change should map to something in the brief.
 
 **Objects.** `frame.create {rect:[x0,y0,x1,y1], shape, content:"text|graphic"}`, `object.fill/stroke`,
 `object.cornerOptions`, `object.effects` (drop shadow etc., flattened at PDF export), `object.align/distribute`,
@@ -173,6 +207,13 @@ After each page or spread:
    adjust tracking within +/-10, resize frames or add a page; never shrink body text below ~8.5 pt.
 5. Before saving: parents applied to all pages, page count right, layer names, no empty frames or
    leftover placeholder text, document title set (`file.new {title}`).
+6. **Cold read** (anything beyond a one-page edit, before section 7): a fresh subagent with a clean
+   context, not a fork, gets only the rendered page PNGs, the brief with its format and constraints,
+   and the tells above. It answers as a magazine art director who owes you nothing: which spreads look
+   templated or AI-made, where the format or constraints vanished, what breaks hierarchy or
+   legibility, worst first, one-line fix direction each, no praise. Fix the severe items; report any
+   you reject and why. Inside a subagent, return the critique inputs (PNG paths, brief, tells) to the
+   orchestrator, which starts the reviewer.
 
 ## 6. Save and export
 

@@ -18,6 +18,12 @@ are never rewritten. You drive it with the `lightcraft` MCP server (headless eng
 `lightcraft-cli` from Bash. This skill says what to do, in what order, and how to hand the result
 to the user.
 
+**A shoot deserves its own look, not the feed's.** Culling and organising are bookkeeping; the
+develop look is where you will drift to the preset average: one stock look pushed over every
+frame, milky blacks, a heavy vignette. A look that belongs to these photos comes from a reference
+outside photo apps, a limit on which controls you touch, virtual-copy alternatives the user
+chooses between, and a viewer who did not develop them. The photographer's own look or reference wins.
+
 - Develop control ids, mask/crop/export params, search filters: `references/command-catalog.md`
 - Recipes (cull a shoot, quick develop, batch web export, B&W, sky mask, sync edits): `references/recipes.md`
 
@@ -103,8 +109,18 @@ library at all (good for "just develop this raw").
    `photo.rename` (renames files on disk) or `photo.deletePermanently` / `library.emptyRecentlyDeleted`
    without explicit consent. `photo.delete` only moves to Recently Deleted (reversible).
 3. **Organise first** (sections 3 and recipe 1), **develop second** (section 4), **export last**.
-4. **Verify loop** after each meaningful step (section 5).
-5. **Show and approve** (section 7), then the final export (section 6).
+4. **Look options** before syncing a creative develop (skip for corrective edits, library-only jobs or a
+   given look): name a **reference outside photo apps** (a painter's palette, a faded postcard, the real
+   light of that place at that hour) and **1-2 limits** (tone curve and white balance only, no
+   saturation slider; one grading hue; at most one mask). Develop 2-3 virtual copies of the hero
+   (`photo.virtualCopy`) that differ in tone, colour and contrast, put them in an album, show and open
+   it (section 7), then ask with the multiple-choice question tool (AskUserQuestion in Claude Code; else
+   a numbered list), multi-select for blends. Never pick for the user. This rule covers creative
+   directions, while technical options may carry a labelled recommendation. Inside a subagent, return
+   the options (album, virtual copy ids, preview paths, brief) to the orchestrator, which asks the user.
+   Sync only the chosen look.
+5. **Verify loop** after each meaningful step (section 5).
+6. **Show and approve** (section 7), then the final export (section 6).
 
 Scale the work: "brighten this photo" is `set_develop` + a preview, not a library project.
 
@@ -175,6 +191,11 @@ Order of operations (matches how the pipeline reads best and avoids fighting you
   Exclude crop and masks unless they truly apply (default copy excludes crop, masks, spot removal).
 - **Versions and virtual copies**: `version.create {name}` snapshots settings; `photo.virtualCopy`
   gives an independent edit of the same file (e.g. colour + B&W) without duplicating pixels.
+- **Default tells** (preset-feed looks; use only when the brief asks): `lc.teal-orange` or any
+  look preset at full amount; clarity, dehaze and shadows pushed together into grunge; masked skies more saturated than the light on the ground; lifted, milky blacks on every
+  frame; a heavy dark vignette by default; vibrance pumped until skin goes orange; one colour kept
+  on a black-and-white frame; `develop.auto` or one preset at 100 % across a shoot shot in different
+  light. Every slider you move should trace back to the brief, the reference or a limit.
 - **Honesty**: cosmetic and dust/blemish work is fine; do not alter photos to fake evidence.
 
 ## 5. Verify loop (mandatory)
@@ -193,6 +214,14 @@ After each major step:
    extreme photo (darkest/brightest), not only the hero.
 5. Before exporting: right photos selected, crop/rotation as intended, rating/flag filters not hiding
    photos from a `dir` export (`export {ids}` is explicit and safest).
+6. **Second opinion on the look** (creative develops of a hero or shoot, before section 7): a fresh
+   subagent with a clean context, not a fork, gets only before/after previews of the hero and of 3-4
+   synced photos, the reference and limits, and the tells in section 4. As a photo editor who did not
+   develop them, it says what looks like a stock preset, where the look fails on particular photos
+   (skin, skies, shadows), and any artefact, ranked by severity with a one-line fix direction; no
+   praise. Fix the serious items; tell the user which ones you leave and why. Inside a subagent,
+   return the critique inputs (preview paths, brief, tells) to the orchestrator, which starts the
+   reviewer.
 
 ## 6. Save and export
 
